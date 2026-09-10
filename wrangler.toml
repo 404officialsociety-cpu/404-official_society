@@ -1,5 +1,5 @@
 name = "404-society-store"
-main = "src/worker.js"
+main = "worker.js"
 compatibility_date = "2026-09-09"
 
 [assets]
