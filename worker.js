@@ -99,6 +99,39 @@ async function handlePaymentStatus(request, env){
 }
 
 async function handleQikink(request, env){
+  if(!env.QIKINK_API_BASE || !env.QIKINK_API_KEY || !env.QIKINK_API_SECRET){
+    return json({error:"Qikink is not configured"},400);
+  }
+
+  const tokenResponse = await fetch(
+    `${env.QIKINK_API_BASE}api/token`,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/x-www-form-urlencoded"
+      },
+      body:new URLSearchParams({
+        ClientId: env.QIKINK_API_KEY,
+        client_secret: env.QIKINK_API_SECRET
+      })
+    }
+  );
+
+  const tokenData = await tokenResponse.json().catch(()=>({}));
+
+  if(!tokenResponse.ok || !tokenData.Accesstoken){
+    return json({
+      error:"Qikink authentication failed",
+      details: tokenData
+    },500);
+  }
+
+  return json({
+    configured:true,
+    authenticated:true,
+    message:"Qikink Sandbox connected successfully"
+  });
+}
   // Intentionally isolated. Do not guess or expose a Qikink credential/payload in the browser.
   // Configure this adapter from the API specification enabled for your Qikink account.
   if(!env.QIKINK_API_BASE || !env.QIKINK_API_KEY || !env.QIKINK_API_SECRET)
